@@ -23,3 +23,4 @@ targets/esp32/app/spiffs/*
 web/package-lock.json
 web/yarn.lock
 py/
+node_modules/
