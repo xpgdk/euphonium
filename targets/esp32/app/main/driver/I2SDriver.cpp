@@ -1,6 +1,6 @@
 #include "I2SDriver.h"
 
-void i2sInstall(int sampleRate, int bitsPerSample, int channelFormatInt, int commFormat, int mclk)
+void i2sInstall(int sampleRate, int bitsPerSample, int channelFormatInt, int commFormatInt, int mclk)
 {
     i2s_channel_fmt_t channelFormat;
     switch (channelFormatInt)
@@ -22,17 +22,39 @@ void i2sInstall(int sampleRate, int bitsPerSample, int channelFormatInt, int com
         break;
     }
 
+    i2s_comm_format_t commFormat;
+    switch(commFormatInt) {
+      case 0x01:
+        commFormat = I2S_COMM_FORMAT_STAND_I2S;
+        break;
+      case 0x02:
+        commFormat = I2S_COMM_FORMAT_STAND_MSB;
+        break;
+      case 0x04:
+        commFormat = I2S_COMM_FORMAT_STAND_PCM_SHORT;
+        break;
+      case 0x0C:
+        commFormat = I2S_COMM_FORMAT_STAND_PCM_LONG;
+        break;
+      default:
+        commFormat = I2S_COMM_FORMAT_STAND_I2S;
+        break;
+    }
+
     i2s_config_t i2s_config = {
         .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
         .sample_rate = (uint32_t) sampleRate,
         .bits_per_sample = (i2s_bits_per_sample_t)bitsPerSample,
         .channel_format = channelFormat,
-        .communication_format = (i2s_comm_format_t)I2S_COMM_FORMAT_STAND_I2S,
+        .communication_format = commFormat,
         .intr_alloc_flags = 0, // Default interrupt priority
         .dma_buf_count = 8,
         .dma_buf_len = 512,
         .use_apll = true,
         .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
+        .fixed_mclk = 0,
+        .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+        .bits_per_chan = I2S_BITS_PER_CHAN_DEFAULT
     };
 
     if (mclk > 0) {
@@ -89,7 +111,9 @@ void InternalDACInstall(int channelFormatInt, int sampleRate)
         .dma_buf_len = 512,
         .use_apll = true,
         .tx_desc_auto_clear = true, // Auto clear tx descriptor on underflow
-        .fixed_mclk=-1
+        .fixed_mclk=-1,
+        .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,
+        .bits_per_chan = I2S_BITS_PER_CHAN_DEFAULT
     };
 
     i2s_driver_install((i2s_port_t)0, &i2s_config, 0, NULL);
