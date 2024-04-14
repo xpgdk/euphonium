@@ -104,7 +104,7 @@ wifi_config_t setWiFiConfigBase(bool ap) {
     memset(&wifi_config, 0, sizeof(wifi_config));
 
     if (!ap) {
-        wifi_config.sta.scan_method = WIFI_FAST_SCAN;
+        wifi_config.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
         wifi_config.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
         wifi_config.sta.threshold.rssi = -127;
         wifi_config.sta.threshold.authmode = WIFI_AUTH_OPEN;
